@@ -30,7 +30,16 @@ jobs:
           repository: teaparty-id/coraline
       
       - name: Get dotenv
+        if: matrix.platform != 'windows-latest'
         run: echo ${{ secrets.DOTENV }} | base64 --decode > .env
+
+      - name: Get dotenv
+        if: matrix.platform == 'windows-latest'
+        shell: pwsh
+        run: |
+          [System.Text.Encoding]::UTF8.GetString(
+            [System.Convert]::FromBase64String("${{ secrets.DOTENV }}")
+          ) | Out-File -FilePath .env -Encoding utf8
 
       - uses: oven-sh/setup-bun@v2
         with:
